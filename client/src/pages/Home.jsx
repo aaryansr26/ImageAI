@@ -18,7 +18,9 @@ const Home = () => {
   
   const [loading, setLoading] = useState(false);
   const[allPosts, setAllPosts] = useState(null);
-  const [searchText, setsearchText] = useState(''); 
+  const [searchText, setSearchText] = useState(''); 
+  const [searchedResults, setSearchedResults] = useState(null); 
+  const [searchTimeout, setSearchTimeout] = useState(null); 
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -46,6 +48,17 @@ const Home = () => {
     }, [])
 
 
+  const handleSearchChange = (e) => {
+    clearTimeout(searchTimeout);
+    setSearchText(e.target.value);
+
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = allPosts.filter((item) => item.name.toLowerCase().includes(searchText.toLowerCase()) || item.prompt.toLowerCase().includes(searchText.toLowerCase()));
+        setSearchedResults(searchResult);
+      }, 500),
+    );
+  };
 
   
   return (
@@ -56,7 +69,14 @@ const Home = () => {
       </div>
 
       <div className='mt-16 '>
-        <FormField />
+        <FormField 
+          labelName="Search posts"
+          type="text"
+          name="text"
+          placeholder="Search something..."
+          value={searchText}
+          handleChange={handleSearchChange}
+        />
       </div>
 
       <div className='mt-10'> 
@@ -77,7 +97,7 @@ const Home = () => {
 
                   {searchText ? (
                     <RenderCards 
-                      data= {[]}
+                      data= {searchedResults}
                       title="no search results found"
                     />
                   ) : (
