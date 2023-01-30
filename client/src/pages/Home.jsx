@@ -5,7 +5,7 @@ import {Cards, Loader, FormField} from '../components/index.js'
 
 const RenderCards = ({data, title}) => {
   if(data?.length > 0) {
-   return data.map((post) => <Card key={post.id}{...post}/>)
+   return data.map((post) => <Cards key={post.id}{...post}/>)
   }
 
   return (
@@ -19,6 +19,33 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const[allPosts, setAllPosts] = useState(null);
   const [searchText, setsearchText] = useState(''); 
+
+  const fetchPosts = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/post', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setAllPosts(result.data.reverse());
+      }
+    } catch (err) {
+      alert(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+    useEffect(() => {
+      fetchPosts(); 
+    }, [])
+
+
 
   
   return (
@@ -55,7 +82,7 @@ const Home = () => {
                     />
                   ) : (
                    <RenderCards 
-                   data= {[]}
+                   data= {allPosts}
                    title="No posts found"
                    /> 
                   )}
